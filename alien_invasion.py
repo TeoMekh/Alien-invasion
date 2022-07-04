@@ -16,6 +16,8 @@ from bullet import Bullet
 
 from alien import Alien
 
+from scoreboard import Scoreboard
+
 
 class AlienInvasion:
     """ Класс для управления ресурсами и поведением игры. """
@@ -32,8 +34,9 @@ class AlienInvasion:
         self.screen = pygame.display.set_mode((self.settings.screen_width, self.settings.screen_height))
         pygame.display.set_caption("Alien invasion")
 
-        # Создание экземпляра для хранения игровой статистики.
+        # Создание экземпляра для хранения игровой статистики и панели результатов.
         self.stats = GameStats(self)
+        self.sb = Scoreboard(self)
 
         self.ship = Ship(self)
         self.bullets = pygame.sprite.Group()
@@ -42,7 +45,6 @@ class AlienInvasion:
 
         # Создание кнопки play.
         self.play_button = Button(self, "Play")
-
 
     def run_game(self):
         """ Запуск основного цикла игры. """
@@ -88,7 +90,6 @@ class AlienInvasion:
 
         # Проверить, добрались ли пришельцы до нижнего края экрана.
         self._check_aliens_bottom()
-
 
     def _ship_hit(self):
         """ Обрабатывает столкновение коряблся с пришельцем. """
@@ -165,7 +166,6 @@ class AlienInvasion:
         elif event.key == pygame.K_SPACE:
             self._fire_bullet()
 
-
     def _check_keyup_events(self, event):
         """ Реагирует на отпускание клавиш. """
         if event.key == pygame.K_RIGHT:
@@ -196,16 +196,14 @@ class AlienInvasion:
             for alien_number in range(number_aliens_x):
                 self._create_alien(alien_number, row_number)
 
-
     def _create_alien(self, alien_number, row_number):
         # Создаем пришельца и размещаем его в ряду.
         alien = Alien(self)
         alien_width, alien_height = alien.rect.size
         alien.x = alien_width + 2 * alien_width * alien_number
         alien.rect.x = alien.x
-        alien.rect.y = alien.rect.height + 2 * alien.rect.height * row_number
+        alien.rect.y = alien.rect.height + 2 * alien.rect.height * row_number + 30
         self.aliens.add(alien)
-
 
     def _check_fleet_edges(self):
         """ Рагирует на достижение пришельцем края экрана. """
@@ -214,13 +212,11 @@ class AlienInvasion:
                 self._change_fleet_direction()
                 break
 
-
     def _change_fleet_direction(self):
         """ Опускает весь флот и меняет направление флота. """
         for alien in self.aliens.sprites():
             alien.rect.y += self.settings.fleet_drop_speed
         self.settings.fleet_direction *= -1
-
 
     def _update_screen(self):
         # При каждом проходе цикла перерисовывается экран.
@@ -230,9 +226,13 @@ class AlienInvasion:
             bullet.draw_bullet()
         self.aliens.draw(self.screen)
 
+        # Вывод информации о счете.
+        self.sb.show_score()
+
         # Кнопка play отображается в том случае, если игра неактивна.
         if not self.stats.game_active:
             self.play_button.draw_button()
+
         # Отображение последнего прорисованного экрана.
         pygame.display.flip()
 
