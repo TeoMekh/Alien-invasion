@@ -74,14 +74,20 @@ class AlienInvasion:
         collisions = pygame.sprite.groupcollide(self.bullets, self.aliens, True, True)
 
         if collisions:
-            self.stats.score += self.settings.alien_points
+            for aliens in collisions.values():
+                self.stats.score += self.settings.alien_points * len(aliens)
             self.sb.prep_score()
+            self.sb.check_high_score()
 
         if not self.aliens:
             # Уничетожение уществующих снарядов и создание нового флота.
             self.bullets.empty()
             self._create_fleet()
             self.settings.increase_speed()
+
+            # Увеличение уровня.
+            self.stats.level += 1
+            self.sb.prep_level()
 
     def _update_aliens(self):
         """ Обновляет позиции всех пришельцев во флоте. """
@@ -100,6 +106,7 @@ class AlienInvasion:
         if self.stats.ships_left > 0:
             # Уменьшение ship_left.
             self.stats.ships_left -= 1
+            self.sb.prep_ships()
 
             """ Очистка списков пришельцев и снарядов."""
             self.aliens.empty()
@@ -128,6 +135,8 @@ class AlienInvasion:
         # Отслеживание событий клавиатуры и мыши.
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
+                with open('record.txt', 'w') as f:
+                    f.write(str(self.stats.high_score))
                 sys.exit()
             elif event.type == pygame.KEYDOWN:
                 self._check_keydown_events(event)
@@ -147,6 +156,9 @@ class AlienInvasion:
             # Сброс игровой статистики.
             self.stats.reset_stats()
             self.stats.game_active = True
+            self.sb.prep_score()
+            self.sb.prep_level()
+            self.sb.prep_ships()
 
             # Очистка списков пришельцев и снарядов.
             self.aliens.empty()
@@ -166,6 +178,8 @@ class AlienInvasion:
         elif event.key == pygame.K_LEFT:
             self.ship.moving_left = True
         elif event.key == pygame.K_q:
+            with open('record.txt', 'w') as f:
+                f.write(str(self.stats.high_score))
             sys.exit()
         elif event.key == pygame.K_SPACE:
             self._fire_bullet()
@@ -194,7 +208,7 @@ class AlienInvasion:
         # Определение количества рядов, помещающихся на экране.
         ship_height = self.ship.rect.height
         available_space_y = (self.settings.screen_height - (10 * alien_height) - ship_height)
-        number_rows = available_space_y // (2 * alien_height)
+        number_rows = available_space_y // (2 * alien_height) - 2
         # Создание флота вторжения пришельцев.
         for row_number in range(number_rows):
             for alien_number in range(number_aliens_x):
@@ -206,7 +220,7 @@ class AlienInvasion:
         alien_width, alien_height = alien.rect.size
         alien.x = alien_width + 2 * alien_width * alien_number
         alien.rect.x = alien.x
-        alien.rect.y = alien.rect.height + 2 * alien.rect.height * row_number + 30
+        alien.rect.y = alien.rect.height + 2 * alien.rect.height * row_number + 70
         self.aliens.add(alien)
 
     def _check_fleet_edges(self):
