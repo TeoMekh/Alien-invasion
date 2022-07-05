@@ -26,6 +26,9 @@ If he looses all three spacecrafts the game is over.
 
 - Arrows keys (left - right)
   - Move the ship left / right
+
+- Key Q
+  - Quit the game
  
  ## ⚔ Let's play
 
