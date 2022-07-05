@@ -51,7 +51,7 @@ class Scoreboard:
 
         # Уровень выводится под тукущим счетом.
         self.level_rect = self.level_image.get_rect()
-        self.level_rect.left = self.screen_rect.left + 300
+        self.level_rect.left = self.screen_rect.left + 220
         self.level_rect.top = self.score_rect.top
 
     def prep_ships(self):
