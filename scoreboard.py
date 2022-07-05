@@ -1,5 +1,6 @@
 import pygame.font
 
+
 class Scoreboard:
     def __init__(self, ai_game):
         """ Инициализирует атрибуты подсчета очков. """
@@ -9,7 +10,7 @@ class Scoreboard:
         self.stats = ai_game.stats
 
         # Настройки шрифта для вывода счета.
-        self.text_color = (30, 30, 30)
+        self.text_color = (255, 255, 255)
         self.font = pygame.font.SysFont(None, 48)
         # Подготовка исходного изображения.
         self.prep_score()
@@ -21,7 +22,7 @@ class Scoreboard:
 
         # Вывод счета в правый верхней части экрана.
         self.score_rect = self.score_image.get_rect()
-        self.score_rect.right = self.score_rect.right - 20
+        self.score_rect.right = self.screen_rect.right -20
         self.score_rect.top = 20
 
     def show_score(self):
